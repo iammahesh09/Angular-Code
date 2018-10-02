@@ -227,3 +227,41 @@ Params Observable
 	    this._router.navigate(['/departments', {id: selectedId}]);
   	}
 
+
+
+Angular 6 Alert Component (Subscription)
+-------------------------
+
+	<div *ngIf="status" [ngClass]="{ 'alert': status, 'alert-success': status.type === 'success', 'alert-danger': status.type === 'error' }">{{status.text}}</div>
+
+
+	alert.component.ts
+	------------------
+		import { Component, OnInit, OnDestroy } from '@angular/core';
+		import { Subscription } from 'rxjs';
+		 
+		import { AlertService } from '../_services';
+		 
+		@Component({
+		    selector: 'alert',
+		    templateUrl: 'alert.component.html'
+		})
+		 
+		export class AlertComponent implements OnInit, OnDestroy {
+		    private subscription: Subscription;
+		    status: any;
+		 
+		    constructor(private alertService: AlertService) { }
+		 
+		    ngOnInit() {
+		        this.subscription = this.alertService.getMessage().subscribe(status => { 
+		            this.status = status; 
+		        });
+		    }
+		 
+		    ngOnDestroy() {
+		        this.subscription.unsubscribe();
+		    }
+		}
+
+
