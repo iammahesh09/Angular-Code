@@ -347,3 +347,38 @@ Angular 6 Animation
 		]
 	})
 
+
+
+Angular 6 Http Request Methods
+------------------------------
+
+	import { HttpHeaders } from '@angular/common/http';
+
+	const httpOptions = {
+		headers: new HttpHeaders({
+			'Content-Type':  'application/json',
+			'Authorization': 'Your-angular6-Live-auth-token'
+		})
+	};
+
+	 // POST: httprequest - Http post and get request in angular 6
+		addusername (user: username): Observable<username> {
+			return this.http.post<username>(this.useresUrl, user, httpOptions).pipe(
+		      catchError(this.handleError('addusername', user))
+		    );
+		}
+
+
+	// POST: Angular 6 Http Post Method with Parameters Example
+		addUser (user: User): Observable<User> {
+			return this.http.post<User>(this.useresUrl, user, httpOptions).pipe(
+				catchError(this.handleError('addUser', user))
+			);
+		}
+	// GET Angular 6 Http GET Method with Parameters Example
+		getUsers (): Observable<User[]> {
+			return this.http.get<User[]>(this.useresUrl).pipe(
+				catchError(this.handleError('getUsers', []))
+			);
+		}
+
