@@ -572,3 +572,40 @@ Angular 6 Auth & Authentication Service (Create Token and get Token)
 
 		}
 
+
+
+Angular 6 Service (Student)
+-------------------------
+	import { Injectable } from '@angular/core';
+	import { HttpClient } from '@angular/common/http';
+	 
+	import { Student } from '../_models';
+	 
+	@Injectable({
+	  providedIn: 'root'
+	})
+
+	export class StudentService {
+	    constructor(private http: HttpClient) { }
+	 
+	    getAll() {
+	        return this.http.get('/api/students');
+	    }
+	 
+	    getById(id: number) {
+	        return this.http.get('/api/students/' + id);
+	    }
+	 
+	    create(student: Student) {
+	        return this.http.post('/api/students', student);
+	    }
+	 
+	    update(student: Student) {
+	        return this.http.put('/api/students/' + student.id, student);
+	    }
+	 
+	    delete(id: number) {
+	        return this.http.delete('/api/students/' + id);
+	    }
+	}
+
