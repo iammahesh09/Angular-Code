@@ -671,3 +671,64 @@ Angular Basic Form Validation
 		</div>
 
 
+
+Angular Form validation (FormBuilder, FormGroup, Validators)
+-------------------------
+
+	import { Component, OnInit } from '@angular/core';
+	import { Router, ActivatedRoute } from '@angular/router';
+	import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+	import { first } from 'rxjs/operators';
+	 
+	import { AlertService, AuthenticationService } from '../_services';
+	 
+	@Component({templateUrl: 'login.component.html'})
+
+	export class LoginComponent implements OnInit {
+
+	    signInFrm: FormGroup;
+	    Processing = false;
+	    frmSubmit = false;
+	    callbackUri: string;
+	 
+	    constructor(
+	        private formBuilder: FormBuilder,
+	        private route: ActivatedRoute,
+	        private router: Router,
+	        private authenticationService: AuthenticationService,
+	        private alertService: AlertService) {}
+	 
+	    ngOnInit() {
+	        this.signInFrm = this.formBuilder.group({
+	            studentname: ['', Validators.required],
+	            password: ['', Validators.required]
+	        });
+	 
+	        this.authenticationService.logout();
+	 
+	        this.callbackUri = this.route.snapshot.queryParams['callbackUri'] || '/';
+	    }
+	 
+	    get f() { return this.signInFrm.controls; }
+	 
+	    onSubmit() {
+	        this.frmSubmit = true;
+	        if (this.signInFrm.invalid) {
+	            return;
+	        }
+	 
+	        this.Processing = true;
+	        this.authenticationService.login(this.f.studentname.value, this.f.password.value)
+	            .pipe(first())
+	            .subscribe(
+	                data => {
+	                    this.router.navigate([this.callbackUri]);
+	                },
+	                error => {
+	                    this.alertService.error(error);
+	                    this.Processing = false;
+	                });
+	    }
+	}
+
+
