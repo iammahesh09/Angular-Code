@@ -609,3 +609,65 @@ Angular 6 Service (Student)
 	    }
 	}
 
+
+
+Angular Basic Form Validation
+-----------------------------
+
+	basic-form.component.html
+	-------------------------
+		<h2 class="text-center mt-5">Angular 6 Basic Form Validation</h2>
+
+		<div class="jumbotron">
+		  <div class="col-sm-8 offset-sm-2">
+
+		    <form novalidate #basicForm="ngForm">
+		      <div class="form-group">
+		        <label>First Name</label>
+		        <input type="text" class="form-control" required minlength="4" name="firstName" [(ngModel)]="_user.firstName"
+		          #firstName="ngModel" placeholder="First Name">
+
+		        <div *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)" class="text-danger">
+		          <div *ngIf="firstName.errors.required">First Name is required.</div>
+		          <div *ngIf="firstName.errors.minlength">Name must be at least 4 characters long.</div>
+		        </div>
+		      </div>
+
+		      <div class="form-group">
+		        <label>Last Name</label>
+		        <input type="text" class="form-control" required [(ngModel)]="_user.lastName" #lastName="ngModel" name="lastName"
+		          placeholder="Last Name" />
+		        <div *ngIf="lastName.invalid && (lastName.dirty || lastName.touched)" class="text-danger">
+		          <div *ngIf="lastName.errors.required">Last Name is required.</div>
+		        </div>
+		      </div>
+
+		      <div class="form-group">
+		        <label>Email</label>
+		        <input type="text" class="form-control" required [(ngModel)]="_user.email" #email="ngModel" name="email"
+		          placeholder="Email" />
+
+		        <div *ngIf="email.invalid && (email.dirty || email.touched)" class="text-danger">
+		          <div *ngIf="email.errors.required">Email is required.</div>
+		        </div>
+		      </div>
+
+		      <div class="form-group">
+		        <label>Password</label>
+		        <input type="password" class="form-control" minlength="6" required [(ngModel)]="_user.password" #password="ngModel"
+		          name="password" placeholder="password" />
+
+		        <div *ngIf="password.invalid && (password.dirty || password.touched)" class="text-danger">
+		          <div *ngIf="password.errors.required">Password is required</div>
+		          <div *ngIf="password.errors.minlength">Password must be at least 6 characters</div>
+		        </div>
+
+		      </div>
+		      <button type="submit" [disabled]="basicForm.invalid" (click)="onSubmit()" class="btn btn-primary">Register</button>
+
+		    </form>
+
+		  </div>
+		</div>
+
+
