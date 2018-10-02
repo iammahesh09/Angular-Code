@@ -161,3 +161,24 @@ Routing
 
 			We’ve also added a redirect from /find to /search, since this isn’t empty we don’t need to add the pathMatch property.
 
+
+
+Receiving Parameters (params)
+-----------------------------
+
+	<h3>You selected department with id = {{departmentId}}</h3>
+
+
+	import { Router, ActivatedRoute } from '@angular/router';
+
+  	
+  	public departmentId;
+
+	constructor(private _activatedRoute: ActivatedRoute){}
+	
+	ngOnInit() {
+		let id = parseInt(this._activatedRoute.snapshot.params['id']);
+		this.departmentId = id;
+	}
+
+
