@@ -818,3 +818,69 @@ Angular Making an Observable
 	memberObservable.subscribe();
 
 
+Lazy Loading
+------------
+
+	movie.lazy.module.ts
+	--------------------
+		import { NgModule } from "@angular/core";
+		import { CommonModule } from "@angular/common";
+		import { HttpClientModule } from "@angular/common/http";
+		import { FormsModule } from "@angular/forms";
+		import { RouterModule, Routes } from "@angular/router";
+
+		import { MovieslistComponent } from "./movieslist/movieslist.component";
+		import { MovieDetailsComponent } from "./movie-details/movie-details.component";
+
+		const routes: Routes = [
+		    { path: '', component: MovieslistComponent },
+		    { path: 'movies/:imdbID', component: MovieDetailsComponent },
+		]
+
+		@NgModule({
+		    declarations: [
+		        MovieslistComponent,
+		        MovieDetailsComponent
+		    ],
+		    imports: [
+		        CommonModule,
+		        HttpClientModule,
+		        FormsModule,
+		        RouterModule.forChild(routes)
+		    ],
+		    exports: [],
+		    providers: [],
+		})
+		export class MovieLazyModule { }
+
+
+
+	Main.Routing.ts
+	---------------
+		import { NgModule } from '@angular/core';
+		import { RouterModule, Routes } from '@angular/router';
+
+		import { AuthGuard } from './services/auth.guard'
+
+		import { SignInComponent } from './sign-in/sign-in.component';
+		import { MenuComponent } from './menu/menu.component';
+
+		const childRoutes: Routes = [
+			{ path: 'movies', loadChildren: './movies/movie.lazy.module#MovieLazyModule' }
+		]
+
+		const appRouters: Routes = [
+			{ path: '', component: MenuComponent, canActivate: [AuthGuard], children: childRoutes },
+			{ path: 'sign-in', component: SignInComponent },
+			{ path: '**', redirectTo: '/' }
+		]
+
+		@NgModule({
+			imports: [
+				RouterModule.forRoot(appRouters)
+			],
+			exports: [RouterModule]
+		})
+
+		export class AppRoutingModule {}
+
