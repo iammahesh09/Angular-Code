@@ -884,3 +884,204 @@ Lazy Loading
 
 		export class AppRoutingModule {}
 
+
+Angular - Communicating Between Components
+------------------------------------------
+
+	- Parent to Child
+
+	- Child to Parent
+
+	- Sibling Component's communication (Use Services)
+		
+		> BehaviorSubject
+
+		> Observable & Subject
+
+
+
+
+	Parent to Child
+	---------------
+
+		#Parent.html
+
+			<section>
+	          	<input type="text" class="form-control" #parentMsg>
+	          	<button (click)="sharedData(parentMsg.value)">Send</button> 
+			</section>
+			<hr />
+			<app-child [childMessage]="parentValue"></app-child>
+
+		#Parent.ts
+		
+			export class ParentComponent implements OnInit {
+				parentValue: any;
+
+				sharedData(data) {
+					this.parentValue = data;
+				}
+			}
+
+		#Child.ts
+
+			import { Component, OnInit, Input } from '@angular/core';
+
+			export class ChildComponent implements OnInit {
+				@Input() childMessage: any;
+			}
+
+
+		#Child.html
+
+			<p class="card-text">{{childMessage}}</p>
+
+
+
+	Child to Parent
+	---------------
+
+
+		#Child.html
+
+    		<input type="text" class="form-control" #childMsg>
+
+          	<button (click)="sharedData(childMsg.value)">Send</button>
+
+
+		#Child.ts
+
+			import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+
+			export class ChildComponent implements OnInit {
+
+			@Output() bindChildEvent = new EventEmitter<any>()
+
+				sharedData(data) {
+					this.bindChildEvent.emit(data)
+				}
+
+			}
+ 
+
+
+        #Parent.html
+      	
+      		<p class="card-text">{{childMsg}}</p>
+    
+			<hr />
+			<app-child (bindChildEvent)="recevieMsgData($event)"></app-child>
+
+
+		#Parent.ts  
+
+			childMsg: any;
+
+			recevieMsgData($event) {
+				this.childMsg = $event;
+			}
+
+
+
+	Sibling Component's communication (BehaviorSubject)
+	---------------------------------------------------
+
+		#Sahred.Service.ts
+
+			import { Injectable } from '@angular/core';
+			import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
+			@Injectable({
+				providedIn: 'root'
+			})
+
+			export class SharedService {
+
+				private messageSource = new BehaviorSubject<any>("Default Meassage");
+
+				currentMsg = this.messageSource.asObservable();
+
+				changeMsg(msg) {
+					this.messageSource.next(msg)
+				}
+
+				constructor() { }
+			}
+
+
+		#ComponentOne.html
+
+			<input type="text" #msg>
+
+			<button (click)="sharedData(msg)">Send</button>
+
+			<p class="card-text">{{SahreMsg}}</p>
+
+
+		#ComponentOne.ts
+
+			import { Component, OnInit } from '@angular/core';
+			import { SharedService } from '../shared.service';
+
+			export class ComponentOne implements OnInit {
+
+				SahreMsg: any;
+
+				constructor(private _sharedSrc: SharedService) { }
+
+				ngOnInit() {
+					this._sharedSrc.currentMsg.subscribe(res => this.SahreMsg = res)
+				}
+
+				sharedData(data) {
+					this._sharedSrc.changeMsg(data.value)
+				}
+
+			}
+
+
+
+		#ComponentTwo.ts
+
+			import { Component, OnInit } from '@angular/core';
+			import { SharedService } from '../shared.service';
+
+			export class ComponentTwo implements OnInit {
+
+				SahreMsg: any;
+
+				constructor(private _sharedSrc: SharedService) { }
+
+				ngOnInit() {
+					this._sharedSrc.currentMsg.subscribe(res => this.SahreMsg = res)
+				}
+
+				sharedData(data) {
+					this._sharedSrc.changeMsg(data.value)
+				}
+
+			}
+
+
+		#ComponentTwo.html
+
+			<input type="text" #msg>
+
+			<button (click)="sharedData(msg)">Send</button>
+
+			<p class="card-text">{{SahreMsg}}</p>
+
+
+
+	Sibling Component's communication (Observable & Subject)
+	--------------------------------------------------------
+
+		# Observable.subscribe()
+
+			- The observable subscribe method is used by angular components to subscribe to messages that are sent to an observable.
+
+		# Subject.next()
+
+			- The subject next method is used to send messages to an observable which are then sent to all angular components that are subscribers (a.k.a. observers) of that observable.
+		
+
