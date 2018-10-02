@@ -182,3 +182,48 @@ Receiving Parameters (params)
 	}
 
 
+
+Params Observable
+-----------------
+	import { Router, ActivatedRoute, Params } from '@angular/router';
+
+	@Component({  
+	  template: `
+	  		<h3>You selected department with id = {{departmentId}}</h3>
+	        <a (click)="goPrevious()">Previous</a>
+	        <a (click)="goNext()">Next</a>
+	        <a (click)="gotoDepartments()">Back</a>
+	  	`
+	})
+
+
+
+	constructor(private _router: Router){}
+
+
+	ngOnInit() {
+		this._router.params.subscribe(
+			(_params: Params) => {
+				let id = parseInt(_params['id']); 
+				this.departmentId = id;
+			});
+	}
+
+	goPrevious(){
+		let previousId = this.departmentId - 1;
+		this._router.navigate(['/department', previousId]);
+	}
+
+	goNext(){
+		console.log('Clicked next');
+		let nextId = this.departmentId + 1;    
+		this._router.navigate(['/department', nextId]);
+	}
+
+	
+	gotoDepartments(){
+		//Optional Params
+	    let selectedId = this.departmentId ? this.departmentId : null;
+	    this._router.navigate(['/departments', {id: selectedId}]);
+  	}
+
