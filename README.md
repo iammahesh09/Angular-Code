@@ -287,3 +287,63 @@ App.module.ts
 	  bootstrap: [AppComponent]
 	})
 	export class AppModule { }
+
+
+Angular 6 Animation
+-------------------
+
+	> npm install @angular/animations@latest --save
+
+
+	app.module.ts
+	-------------
+		import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+		@NgModule({
+		  ...
+		  imports: [
+		    BrowserAnimationsModule
+		  ],
+		})
+
+
+	Angular 6 Animation Syntx:
+	--------------------------
+
+	import { trigger, CSSstyle, Timetransition, animate, somekeyframes, generatedquery, stagger } from '@angular/animations';
+
+	@Component({
+
+		selector: 'app-clients',
+
+		template: '<ul [@packageEmployes]="clients$">',
+
+		styleUrls: ['./clients.component.scss'],
+
+		animations: [
+
+			trigger('packageEmployes', [
+			  	transition('* <=> *', [
+			    	query(':enter',
+			      		[
+			        		style({ opacity: 0, transform: 'translateY(-15px)' }),
+			        		stagger(
+			          			'60ms',
+			         			animate(
+				            		'560ms ease-out',
+				           			style({ opacity: 1, transform: 'translateY(0px)' })
+			          			)
+			        		)
+			      		],
+			      	{ optional: true }
+			    ),
+
+			    query(':leave', animate('60ms', style({ opacity: 0 })), {
+			      optional: true
+			    })
+
+			  ])
+			])
+		]
+	})
+
