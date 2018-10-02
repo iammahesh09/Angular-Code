@@ -382,3 +382,193 @@ Angular 6 Http Request Methods
 			);
 		}
 
+
+
+Angular 6 Auth & Authentication Service (Create Token and get Token)
+---------------------------------------
+
+	auth.guard.ts
+	-------------
+		import { Injectable } from '@angular/core';
+		import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, CanDeactivate, Router } from '@angular/router';
+		import { Observable } from 'rxjs';
+		import { AuthService } from './auth.service';
+
+		@Injectable({
+			providedIn: 'root'
+		})
+		export class AuthGuard implements CanActivate {
+
+		constructor(private _authService: AuthService, private _router: Router) { }
+
+			canActivate( next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+			
+				let url: string = state.url;
+				console.log("Satte Url = " + url)
+				
+				if (this._authService.isAuthenticated()) {
+					return true;
+				} else {
+					this._router.navigate(['/sign-in']);
+					return false
+				}
+
+			}
+		}
+
+
+
+	auth.service.ts
+	---------------
+		import { Injectable } from '@angular/core';
+		import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+		import { User } from '../models/user.model';
+		import { Router } from '@angular/router';
+		import { Subject, throwError } from 'rxjs';
+		import { map, catchError } from 'rxjs/operators';
+
+		@Injectable({
+			providedIn: 'root'
+		})
+		
+		export class AuthService {
+
+			loginUrl: string = "http://localhost:9001/api/users/login";
+
+			constructor(private _http: HttpClient, private _router: Router) { }
+
+			login(userData: User) {
+				return this._http.post(this.loginUrl, userData);
+			}
+
+			saveToken(token: string) {
+				return sessionStorage.setItem("token", token)
+			}
+
+			getToken() {
+				return sessionStorage.getItem('token')
+			}
+
+			isLoggedin() {
+				return !!sessionStorage.getItem("token");
+			}
+
+			logout() {
+				localStorage.removeItem("token");
+				this._router.navigate(['/sign-in'])
+			}
+
+			isAuthenticated(): boolean {
+				const GetToken = sessionStorage.getItem('token');
+				
+				if (GetToken && GetToken.length > 0) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+		}
+
+
+	sign-in.component.ts
+	--------------------	
+		import { Component, OnInit } from '@angular/core';
+		import { AuthService } from '../services/auth.service';
+		import { Router } from '@angular/router';
+
+		@Component({
+			selector: 'app-sign-in',
+			templateUrl: './sign-in.component.html',
+			styleUrls: ['./sign-in.component.css']
+		})
+
+		export class SignInComponent implements OnInit {
+
+			_user: any = {}
+
+			loginResult: boolean;
+			loginResultMsg: string;
+			loginError: boolean = false;
+			constructor(private _authService: AuthService, private _router: Router) { }
+
+			userLogin() {
+
+				this._authService.login(this._user).subscribe(
+					res => {
+						this.loginResult = true;
+						this.loginError = true;
+						this.loginResultMsg = "Successfully login"
+						this._authService.saveToken(res["token"])
+						this._router.navigate(["/dashborad"]);
+					},
+					error => {
+						this.loginResult = true;
+						this.loginError = true;
+						this.loginResultMsg = "Error! Please check username and password details"
+						this._router.navigate(['/sign-in'])
+					}
+				)
+			}
+
+			ngOnInit() {
+			}
+
+		}
+
+
+
+	sign-in.component.html
+	----------------------
+
+		<div *ngIf="loginError" [class]="loginResult?['alert alert-danger']:['alert alert-success']">{{loginResultMsg}}</div>
+		
+		<form novalidate #loginForm="ngForm">
+			
+			<div class="form-group">
+				<input type="email" placeholder="Enter email" [(ngModel)]="_user.username" #username="ngModel" name="username">		
+			</div>
+			
+			<div class="form-group">
+				<input type="password" placeholder="Password" [(ngModel)]="_user.password" #password="ngModel" name="password">
+			</div>
+			
+			<button type="submit" class="btn btn-success" [disabled]="loginForm.invalid" (click)="userLogin()">Submit</button>
+
+		</form>
+
+
+	
+	product.service.ts (get Token)
+	------------------
+
+		import { Injectable } from '@angular/core';
+		import { HttpClient } from '@angular/common/http';
+		import { AuthService } from './auth.service';
+		import { Product } from "../models/product.model";
+
+		@Injectable({
+			providedIn: 'root'
+		})
+		
+		export class productService {
+
+			constructor(private _http: HttpClient, private _authService: AuthService) { }
+
+			getProductData() {
+
+				var hder = { 'authorization': this._authService.getToken() };
+
+				return this._http.get<Product[]>("http://localhost:9001/api/products/", { headers: hder })
+			}
+
+			saveProduct(data) {
+
+				var hder = { 'authorization': this._authService.getToken() };
+
+				return this._http.post<Product[]>("http://localhost:9001/api/products/", data, { headers: hder })
+			}
+
+
+		}
+
